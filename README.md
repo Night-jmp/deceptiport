@@ -1,4 +1,4 @@
-Deceptiport v. 1.2
+Deceptiport v. 1.3
 =====
 
 Deceptiport is a Python based cyber-deception tool meant to detect and act on reconnaissance and enumeration attempts
@@ -27,7 +27,9 @@ Deceptiport is a Python based cyber-deception tool meant to detect and act on re
   All modules used are built into python2. Easy!
 
 ## Support scripts
-
-  A method for cleaning up the threads when shutting down deceptiport has not been fully developed. In the mean time, there is a script I developed to kill the process.
-  
+ 
   During testing, you may want to comment out the os.system function call enacting the iptables rule. If you don't, and inadvertently find yourself trying to get the IP address of the machine you've created a firewalll rule for back into the testing loop, you can use a script I created to quickly reverse the damage.
+
+## Version 1.3 updates
+
+  Added a method to catch a sigint to close out the application. Previous version deadlocked due to service object threads not getting the memo from the main thread.

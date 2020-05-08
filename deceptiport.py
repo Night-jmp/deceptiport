@@ -5,6 +5,7 @@ import threading
 import os
 import sys
 import getopt
+import signal
 
 activeConnections = {}
 
@@ -51,7 +52,7 @@ class createService:
             
             while True:                                                # Continuously listen for additional connections
                 self.listen(self.sock)
-        
+
         except IOError as e:
             if e.errno == 13:
                 print "You need elevated privileges to open port " + str(port)
@@ -123,14 +124,16 @@ class createService:
 
 def usage():
 
-    print "Deceptiport 1.2"
+    print "Deceptiport 1.3"
     print "Usage: "
     print "\t./deceptiport.py -p <ports> -m <max connections>"
     print "\nDeceptiport opens ports on all user specified port numbers.\nIf an attacker connects to greater than or equal to the maximum specified connections, their IP address is blocked."
     print "NOTE: If using port numbers under 1024, you must be a sudoer!"
     print "\nExample: ./deceptiport -p '21,22,80' -m 3"
 
-
+def exit(signal, frame):
+    print "\nExiting!"
+    sys.exit(0)
 
 if __name__ == "__main__":
 
@@ -151,13 +154,19 @@ if __name__ == "__main__":
     for opt, arg in opts:
         if opt == '-h':
             usage()
+            sys.exit(2)
         elif opt in '-p':
             ports = arg.split(",")
         elif opt in '-m':
             MAXCONN = arg
     if len(opts) == 0:
         usage()
+        sys.exit(2)
 
     for port in ports:
         t = threading.Thread(target=createService, args=(port,MAXCONN))
+        t.daemon = True
         t.start()
+
+    while True:
+        signal.signal(signal.SIGINT, exit)
